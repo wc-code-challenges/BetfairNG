@@ -247,3 +247,6 @@ ModelManifest.xml
 /ConsoleExample/App.config
 /ConsoleExample/SecureStringManager.cs
 .nuget
+
+#betfair code
+stream-api-sample-code/

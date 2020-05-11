@@ -136,7 +136,7 @@ namespace BetfairNG
             return r;
         }
 
-        private Task<string> Request(
+        private async Task<string> Request(
             string url, 
             string requestPostData,
             string contentType,
@@ -175,24 +175,19 @@ namespace BetfairNG
             if (TimeoutMilliseconds != 0)
                 request.Timeout = TimeoutMilliseconds;
 
-            var result = Task.Factory.FromAsync(
+            var stream = await Task.Factory.FromAsync(
                     request.BeginGetRequestStream,
                     asyncResult => request.EndGetRequestStream(asyncResult),
                     (object)null);
 
-            var continuation = result
-                .ContinueWith(stream =>
-                    {
-                        stream.Result.Write(postData, 0, postData.Length);
-                        Task<WebResponse> task = Task.Factory.FromAsync(
-                        request.BeginGetResponse,
-                        asyncResult => request.EndGetResponse(asyncResult),
-                        (object)null);
+            stream.Write(postData, 0, postData.Length);
 
-                        return task.ContinueWith(t => GetResponseHtml((HttpWebResponse)t.Result));
-                    }).Unwrap();
+            var webResponse = await Task.Factory.FromAsync(
+                request.BeginGetResponse,
+                asyncResult => request.EndGetResponse(asyncResult),
+                (object)null);
 
-            return continuation;
+            return GetResponseHtml((HttpWebResponse)webResponse);
         }
 
         private string GetResponseHtml(HttpWebResponse response)
