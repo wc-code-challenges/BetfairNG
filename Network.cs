@@ -13,6 +13,8 @@ namespace BetfairNG
 {
     public class Network
     {
+        public const int BetfairDelayLogTimeThreshold = 150;
+
         public string UserAgent { get; set; }
         public string Host { get; set; }
         public string AppKey { get; set; }
@@ -89,7 +91,7 @@ namespace BetfairNG
         {
             if (string.IsNullOrWhiteSpace(method)) throw new ArgumentNullException("method");
 
-            TraceSource.TraceInformation("Network: {0}, {1}", FormatEndpoint(endpoint), method);
+            Trace.TraceInformation("Network: {0}, {1}", endpoint, method);
             DateTime requestStart = DateTime.Now;
             Stopwatch watch = new Stopwatch();
             watch.Start();
@@ -143,6 +145,7 @@ namespace BetfairNG
             string appKey,
             string sessionToken)
         {
+            var sw = Stopwatch.StartNew();
             if (this.PreRequestAction != null)
                 PreRequestAction();
 
@@ -175,19 +178,20 @@ namespace BetfairNG
             if (TimeoutMilliseconds != 0)
                 request.Timeout = TimeoutMilliseconds;
 
-            var stream = await Task.Factory.FromAsync(
-                    request.BeginGetRequestStream,
-                    asyncResult => request.EndGetRequestStream(asyncResult),
-                    (object)null);
+            var stream = await request.GetRequestStreamAsync();
 
-            stream.Write(postData, 0, postData.Length);
+            using (stream)
+                stream.Write(postData, 0, postData.Length);
 
-            var webResponse = await Task.Factory.FromAsync(
-                request.BeginGetResponse,
-                asyncResult => request.EndGetResponse(asyncResult),
-                (object)null);
+            var webResponse = await request.GetResponseAsync();
 
-            return GetResponseHtml((HttpWebResponse)webResponse);
+            sw.Stop();
+
+            if(sw.ElapsedMilliseconds > BetfairDelayLogTimeThreshold)
+                Trace.TraceInformation("Betfair request time taken is '{0}' the request Timeout is {1} to {2}", sw.ElapsedMilliseconds, TimeoutMilliseconds, url);
+
+            using (webResponse)
+                return GetResponseHtml((HttpWebResponse)webResponse);
         }
 
         private string GetResponseHtml(HttpWebResponse response)
