@@ -308,6 +308,24 @@ namespace BetfairNG
             return Table[index - num];
         }
 
+        /// <summary>
+        /// Snap to a value below the price selected
+        /// </summary>
+        /// <param name="price"></param>
+        /// <returns></returns>
+        public static double SnapToLadder(double price)
+        {
+            if (IsValidPrice(price)) return price;
+
+            for (var index = 1; index < Table.Length; index++)
+            {
+                if (Table[index] > price)
+                    return Table[index - 1];
+            }
+
+            return Table.Last();
+        }
+
         public static double RoundDownToNearestBetfairPrice(double price)
         {
             if (IsValidPrice(price))
