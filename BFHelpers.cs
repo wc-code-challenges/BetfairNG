@@ -309,10 +309,10 @@ namespace BetfairNG
         }
 
         /// <summary>
-        /// Snap to a value below the price selected
+        /// Find the first value on the ladder greater than the price and snap to the next position below that value.
         /// </summary>
-        /// <param name="price"></param>
-        /// <returns></returns>
+        /// <param name="price">The price to snap onto the ladder</param>
+        /// <returns>the price if is is on the ladder or the value closest on the ladder below the input price</returns>
         public static double SnapToLadder(double price)
         {
             if (IsValidPrice(price)) return price;
@@ -352,7 +352,7 @@ namespace BetfairNG
             for (int i = 0; i < Table.Length; i++)
             {
                 if (Table[i] > price)
-                    return Table[index++];
+                    return Table[++index];
 
                 index++;
             }
