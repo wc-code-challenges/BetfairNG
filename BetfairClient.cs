@@ -76,6 +76,7 @@ namespace BetfairNG
         private static readonly string MARKET_ID = "marketId";
         private static readonly string INSTRUCTIONS = "instructions";
         private static readonly string CUSTOMER_REFERENCE = "customerRef";
+        private static readonly string CUSTOMER_STRATEGY = "customerStrategyRef";
         private static readonly string INCLUDE_SETTLED_BETS = "includeSettledBets";
         private static readonly string INCLUDE_BSP_BETS = "includeBspBets";
         private static readonly string INCLUDE_ITEM_DESCRIPTION = "includeItemDescription";
@@ -318,7 +319,8 @@ namespace BetfairNG
             string marketId, 
             IList<PlaceInstruction> placeInstructions,
             string customerRef = null,
-            MarketVersion marketVersion = null)
+            MarketVersion marketVersion = null,
+            string customerStrategyRef = null)
         {
             var args = new Dictionary<string, object>();
 
@@ -326,6 +328,8 @@ namespace BetfairNG
             args[INSTRUCTIONS] = placeInstructions;
             args[CUSTOMER_REFERENCE] = customerRef;
             args[MARKET_VERSION] = marketVersion;
+            //MAX 15 CHARS
+            args[CUSTOMER_STRATEGY] = customerStrategyRef;
 
             return networkClient.Invoke<PlaceExecutionReport>(Endpoint.Betting, PLACE_ORDERS_METHOD, args);
         }

@@ -74,5 +74,8 @@ namespace BetfairNG.Data
 
         [JsonProperty(PropertyName = "sizeCancelled")]
         public double SizeCancelled { get; set; }
-    }
+        
+        [JsonProperty(PropertyName = "customerStrategyRef")]
+		public string CustomerStrategyRef { get; set; }
+	}
 }
