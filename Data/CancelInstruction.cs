@@ -17,6 +17,6 @@ namespace BetfairNG.Data
         /// https://docs.developer.betfair.com/display/1smk3cen4v3lu3yomq5qye0ni/Betting+Type+Definitions#BettingTypeDefinitions-CancelInstruction see size reduction field
         /// </summary>
         [JsonProperty(PropertyName = "sizeReduction")]
-        public double? SizeReduction { get; set; }
+        public double? SizeReduction { get; set; } 
     }
 }
